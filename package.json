@@ -57,6 +57,7 @@
     "@adonisjs/lucid": "^21.2.0",
     "@vinejs/vine": "^2.1.0",
     "better-sqlite3": "^11.2.1",
+    "jdenticon": "^3.3.0",
     "luxon": "^3.5.0",
     "reflect-metadata": "^0.2.2"
   },
