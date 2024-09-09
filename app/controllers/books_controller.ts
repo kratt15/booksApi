@@ -57,11 +57,13 @@ export default class BooksController {
   /**
    * Handle form submission for the edit action
    */
-  async update({ params, request, response, auth }: HttpContext) {
+  async update({ params, request, response, auth, bouncer }: HttpContext) {
 
     const playload = await request.validateUsing(BookUpdateValidation)
 
     const book = await Book.findOrFail(params.id)
+
+    await bouncer.with('BookPolicy').authorize('update', book)
 
     if(playload.cover){
 
@@ -86,9 +88,11 @@ export default class BooksController {
   /**
    * Delete record
    */
-  async destroy({ params,response }: HttpContext) {
+  async destroy({ params,response,bouncer }: HttpContext) {
 
      const book = await Book.findOrFail(params.id)
+
+     await bouncer.with('BookPolicy').authorize('update', book)
 
      await book.related('categories').detach()
 
@@ -97,7 +101,7 @@ export default class BooksController {
       await unlink(`public/${book.cover}`)
 
      }
-     
+
      await book.delete()
 
      return response.status(201).json({message: 'Book deleted successfully'})
