@@ -4,6 +4,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import FileUploaderService from '#services/file_uploader_service'
 import { inject } from '@adonisjs/core'
 import { unlink } from 'fs/promises'
+import mail from '@adonisjs/mail/services/main'
+
 
 @inject()
 export default class BooksController {
@@ -40,8 +42,17 @@ export default class BooksController {
       userId: auth.user!.id,
       cover: filePath
     })
+
     await book.related('categories').attach(playload.categories)
 
+    await book.load('categories')
+    await mail.send((message) => {
+        message.from('booksapi@example.com')
+        .to(auth.user!.email)
+        .subject("thanks for adding a new book to our API")
+        .attach(`public/${filePath}`)
+        .htmlView('emails/create',{book})
+    })
     return response.status(201).json({message: 'Book created successfully'})
   }
 
